@@ -1,0 +1,19 @@
+.header__login {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 550px) {
+  .header__content {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-block: 16px;
+  }
+
+  .navigation {
+    order: 3;
+    justify-content: center;
+    width: 100%;
+  }
+}

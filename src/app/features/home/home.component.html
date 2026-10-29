@@ -1,0 +1,176 @@
+<header class="header">
+  <div class="container header__content">
+    <a class="brand" routerLink="/" aria-label="Entrena, inicio">
+      <span class="brand__icon" aria-hidden="true">E</span>
+      <span>entrena<span class="brand__accent">.</span></span>
+    </a>
+
+    <nav class="navigation" aria-label="Navegación principal">
+      <a href="#funciones">Funciones</a>
+      <a href="#como-funciona">Cómo funciona</a>
+    </nav>
+
+    <a
+      class="button button--secondary header__login"
+      routerLink="/login"
+    >
+      Iniciar sesión
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero__content">
+      <p class="eyebrow">TU OBJETIVO. TU RITMO.</p>
+
+      <h1 id="hero-title">
+        Dale estructura
+        <span>a tu entrenamiento.</span>
+      </h1>
+
+      <p class="hero__description">
+        Organiza tu semana según tu objetivo, tu experiencia,
+        los días disponibles y el equipo con el que cuentas.
+      </p>
+
+      <div class="hero__actions">
+        <a class="button button--primary" routerLink="/login">
+          Iniciar sesión
+        </a>
+
+        <a class="button button--secondary" href="#funciones">
+          Explorar funciones
+        </a>
+      </div>
+
+      <p class="hero__note">
+        Reglas claras y comprobables. Sin inteligencia artificial.
+      </p>
+    </div>
+
+    <aside class="preview" aria-labelledby="preview-title">
+      <div class="preview__header">
+        <div>
+          <p class="preview__label">TU SEMANA, ORGANIZADA</p>
+          <h2 id="preview-title">Cada sesión cuenta.</h2>
+        </div>
+
+        <span class="preview__badge">Ejemplo</span>
+      </div>
+
+      <div class="session">
+        <span class="session__day">LUN</span>
+
+        <div class="session__content">
+          <h3>Entrenamiento del día</h3>
+          <p>Ejercicios compatibles con tu perfil</p>
+        </div>
+
+        <span class="session__dot" aria-hidden="true"></span>
+      </div>
+
+      <div class="preview__details">
+        <div>
+          <span>Disponibilidad</span>
+          <strong>Tus días</strong>
+        </div>
+
+        <div>
+          <span>Equipamiento</span>
+          <strong>Tu espacio</strong>
+        </div>
+      </div>
+
+      <div class="preview__message">
+        <span aria-hidden="true">✓</span>
+        <p>
+          Consulta por qué se seleccionó cada ejercicio de tu plan.
+        </p>
+      </div>
+
+      <p class="preview__disclaimer">
+        Vista ilustrativa. No es un plan generado.
+      </p>
+    </aside>
+  </section>
+
+  <section
+    id="funciones"
+    class="features container"
+    aria-labelledby="features-title"
+  >
+    <div class="section-heading">
+      <p class="eyebrow">UN ESPACIO PARA TU PROGRESO</p>
+      <h2 id="features-title">Menos improvisación. Más organización.</h2>
+      <p>
+        Estas son las funciones que estamos construyendo
+        para acompañar tu entrenamiento.
+      </p>
+    </div>
+
+    <div class="features__grid">
+      <article class="feature-card">
+        <span class="feature-card__number">01</span>
+        <h3>Plan semanal</h3>
+        <p>
+          Una rutina organizada según tu perfil, tu disponibilidad
+          y reglas que podrás consultar.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-card__number">02</span>
+        <h3>Entrenamiento activo</h3>
+        <p>
+          Registra tus series, controla los descansos y consulta
+          el progreso de cada sesión.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-card__number">03</span>
+        <h3>Bienestar diario</h3>
+        <p>
+          Guarda el total de agua que tomaste y las horas
+          que dormiste, con un registro por día.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section
+    id="como-funciona"
+    class="how-it-works container"
+    aria-labelledby="how-title"
+  >
+    <div class="section-heading">
+      <p class="eyebrow">PASO A PASO</p>
+      <h2 id="how-title">De tu perfil a tu próxima sesión.</h2>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h3>Completa tu perfil</h3>
+        <p>Indica tu objetivo, nivel y equipo disponible.</p>
+      </li>
+
+      <li>
+        <h3>Selecciona tus días</h3>
+        <p>Define cuándo puedes entrenar durante la semana.</p>
+      </li>
+
+      <li>
+        <h3>Registra tu progreso</h3>
+        <p>Completa tus sesiones y consulta tu historial.</p>
+      </li>
+    </ol>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__content">
+    <span>entrena.</span>
+    <p>Proyecto académico de entrenamiento y bienestar.</p>
+  </div>
+</footer>
