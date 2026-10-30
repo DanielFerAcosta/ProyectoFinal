@@ -1,0 +1,132 @@
+:host {
+  display: block;
+}
+
+.navbar {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 88px;
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+  color: var(--color-text);
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+
+  &__icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--color-primary);
+    color: var(--color-background);
+    font-size: 1.2rem;
+  }
+
+  &__accent {
+    color: var(--color-primary);
+  }
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  &__link {
+    padding-block: 8px;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+
+    &--active {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+  }
+
+  &__login {
+    min-height: 42px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  > span:first-child {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .navbar__container {
+    flex-wrap: wrap;
+    gap: 0;
+    min-height: 76px;
+    padding-block: 16px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .navigation {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+
+    &--open {
+      display: flex;
+    }
+
+    &__link {
+      padding: 12px;
+      border-radius: var(--radius-control);
+
+      &:hover {
+        background: var(--color-surface);
+      }
+
+      &--active {
+        background: var(--color-surface);
+      }
+    }
+
+    &__login {
+      margin-top: 8px;
+    }
+  }
+}
