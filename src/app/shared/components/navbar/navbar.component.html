@@ -1,0 +1,83 @@
+<header class="navbar" (keydown.escape)="closeMenu()">
+  <div class="container navbar__container">
+    <a
+      class="brand"
+      routerLink="/"
+      aria-label="Entrena, inicio"
+      (click)="closeMenu()"
+    >
+      <span class="brand__icon" aria-hidden="true">E</span>
+      <span>entrena<span class="brand__accent">.</span></span>
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-controls="main-navigation"
+      [attr.aria-expanded]="menuOpen()"
+      [attr.aria-label]="
+        menuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'
+      "
+      (click)="toggleMenu()"
+    >
+      <span aria-hidden="true">
+        {{ menuOpen() ? '✕' : '☰' }}
+      </span>
+      <span>{{ menuOpen() ? 'Cerrar' : 'Menú' }}</span>
+    </button>
+
+    <nav
+      id="main-navigation"
+      class="navigation"
+      [class.navigation--open]="menuOpen()"
+      aria-label="Navegación principal"
+    >
+      <a
+        class="navigation__link"
+        routerLink="/"
+        routerLinkActive="navigation__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+      >
+        Inicio
+      </a>
+
+      <a
+        class="navigation__link"
+        routerLink="/"
+        fragment="ejercicios"
+        (click)="closeMenu()"
+      >
+        Ejercicios
+      </a>
+
+      <a
+        class="navigation__link"
+        routerLink="/"
+        fragment="como-funciona"
+        (click)="closeMenu()"
+      >
+        Cómo funciona
+      </a>
+
+      <a
+        class="navigation__link"
+        routerLink="/login"
+        routerLinkActive="navigation__link--active"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+      >
+        Iniciar sesión
+      </a>
+
+      <a
+        class="button button--primary navigation__login"
+        routerLink="/registro"
+        (click)="closeMenu()"
+      >
+        Crear cuenta
+      </a>
+    </nav>
+  </div>
+</header>

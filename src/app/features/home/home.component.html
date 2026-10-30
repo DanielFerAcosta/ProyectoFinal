@@ -1,0 +1,257 @@
+<app-navbar />
+
+<main>
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero__content">
+      <p class="eyebrow">ENTRENAMIENTO CON ESTRUCTURA</p>
+
+      <h1 id="hero-title">
+        Tu objetivo.
+        <span>Tu próxima sesión.</span>
+      </h1>
+
+      <p class="hero__description">
+        Organiza tu entrenamiento según tu nivel, los días disponibles
+        y el equipo con el que cuentas.
+      </p>
+
+      <div class="hero__actions">
+        <a class="button button--primary" href="#ejercicios">
+          Explorar ejercicios
+        </a>
+
+       <a class="button button--secondary" routerLink="/registro">
+  Crear cuenta
+</a>
+      </div>
+
+      <p class="hero__note">
+        Planes basados en reglas claras. Sin inteligencia artificial.
+      </p>
+    </div>
+
+    <aside class="plan-card" aria-labelledby="plan-card-title">
+      <div class="plan-card__header">
+        <p class="eyebrow">DE TU PERFIL A TU PLAN</p>
+        <span class="badge">Vista del proyecto</span>
+      </div>
+
+      <h2 id="plan-card-title">Un plan con explicación.</h2>
+
+      <p class="plan-card__description">
+        Cada selección tendrá en cuenta las condiciones que registres.
+      </p>
+
+      <ul class="plan-factors">
+        <li>
+          <span class="plan-factors__number">01</span>
+          <div>
+            <h3>Tu disponibilidad</h3>
+            <p>Los días que puedes dedicar a entrenar.</p>
+          </div>
+        </li>
+
+        <li>
+          <span class="plan-factors__number">02</span>
+          <div>
+            <h3>Tu equipamiento</h3>
+            <p>Los recursos con los que realmente cuentas.</p>
+          </div>
+        </li>
+
+        <li>
+          <span class="plan-factors__number">03</span>
+          <div>
+            <h3>Tu nivel y objetivo</h3>
+            <p>Las preferencias que configures en tu perfil.</p>
+          </div>
+        </li>
+      </ul>
+
+      <p class="plan-card__note">
+        El generador de planes se conectará en una siguiente etapa.
+      </p>
+    </aside>
+  </section>
+
+  <section
+    id="ejercicios"
+    class="catalog container"
+    aria-labelledby="catalog-title"
+  >
+    <div class="section-heading section-heading--split">
+      <div>
+        <p class="eyebrow">EXPLORA EL MOVIMIENTO</p>
+        <h2 id="catalog-title">Encuentra tu punto de partida.</h2>
+        <p class="section-description">
+          Explora esta muestra de ejercicios por equipamiento.
+        </p>
+      </div>
+
+      <span class="badge">Catálogo de demostración</span>
+    </div>
+
+    <div
+      class="equipment-filters"
+      role="group"
+      aria-label="Filtrar ejemplos por equipamiento"
+    >
+      @for (filter of equipmentFilters; track filter.value) {
+        <button
+          class="filter-button"
+          type="button"
+          [class.filter-button--active]="selectedEquipment === filter.value"
+          [attr.aria-pressed]="selectedEquipment === filter.value"
+          (click)="selectEquipment(filter.value)"
+        >
+          {{ filter.label }}
+        </button>
+      }
+    </div>
+
+    <p class="catalog__count" role="status">
+      {{ filteredExercises.length }}
+      {{ filteredExercises.length === 1 ? 'ejemplo disponible' : 'ejemplos disponibles' }}
+    </p>
+
+    <div class="exercise-grid">
+      @for (exercise of filteredExercises; track exercise.id) {
+        <article
+          class="exercise-card"
+          [attr.aria-labelledby]="'exercise-title-' + exercise.id"
+        >
+          <div class="exercise-card__visual" aria-hidden="true">
+            <span class="exercise-card__index">{{ exercise.symbol }}</span>
+
+            <svg
+              class="exercise-card__icon"
+              viewBox="0 0 100 100"
+              fill="none"
+              focusable="false"
+            >
+              <path
+                  d="M28 50H72 M20 32V68 M30 38V62 M70 38V62 M80 32V68"
+                  stroke="currentColor"
+                  stroke-width="7"
+                  stroke-linecap="round"
+              />
+            </svg>
+
+            <span class="exercise-card__visual-label">
+              {{ exercise.equipmentLabel }}
+            </span>
+          </div>
+
+          <div class="exercise-card__content">
+            <p class="exercise-card__muscle">{{ exercise.muscle }}</p>
+
+            <h3 [id]="'exercise-title-' + exercise.id">
+              {{ exercise.name }}
+            </h3>
+
+            <div class="exercise-card__footer">
+              <span>{{ exercise.equipmentLabel }}</span>
+              <span class="exercise-card__example">Ejemplo</span>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <p class="catalog__note">
+      Muestra visual con datos locales. Las ilustraciones son decorativas;
+      no representan la técnica de los ejercicios.
+    </p>
+  </section>
+
+  <section
+    id="funciones"
+    class="features container"
+    aria-labelledby="features-title"
+  >
+    <div class="section-heading">
+      <p class="eyebrow">MÁS QUE UNA LISTA DE EJERCICIOS</p>
+      <h2 id="features-title">Organiza, entrena y lleva tu registro.</h2>
+      <p class="section-description">
+        Estas son las funciones que estamos construyendo para tu rutina.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature-card">
+        <span class="feature-card__number">01 / PLANIFICA</span>
+        <h3>Tu semana, organizada</h3>
+        <p>
+          Un plan basado en tu perfil, tu disponibilidad
+          y reglas que podrás consultar.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-card__number">02 / ENTRENA</span>
+        <h3>Cada serie cuenta</h3>
+        <p>
+          Registro de series, control de descansos
+          y seguimiento de la sesión activa.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-card__number">03 / REGISTRA</span>
+        <h3>Hábitos sin complicaciones</h3>
+        <p>
+          Un registro diario del agua que tomaste
+          y las horas que dormiste.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section
+    id="como-funciona"
+    class="how-it-works container"
+    aria-labelledby="how-title"
+  >
+    <div class="how-panel">
+      <div class="section-heading">
+        <p class="eyebrow">REGLAS, NO ADIVINANZAS</p>
+        <h2 id="how-title">Un proceso que podrás entender.</h2>
+        <p class="section-description">
+          El sistema utilizará filtros y reglas programadas
+          para construir el plan.
+        </p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <h3>Completa tu perfil</h3>
+          <p>Define tu objetivo, nivel y equipamiento.</p>
+        </li>
+
+        <li>
+          <h3>Selecciona tus días</h3>
+          <p>Indica tu disponibilidad durante la semana.</p>
+        </li>
+
+        <li>
+          <h3>Consulta tu plan</h3>
+          <p>Revisa los ejercicios y las razones de su selección.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__content">
+    <a class="footer__brand" routerLink="/" aria-label="Entrena, inicio">
+      entrena<span>.</span>
+    </a>
+
+    <p>Proyecto académico de entrenamiento y bienestar.</p>
+
+    <a class="footer__link" href="#ejercicios">
+      Explorar ejercicios
+    </a>
+  </div>
+</footer>
