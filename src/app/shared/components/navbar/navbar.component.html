@@ -46,10 +46,10 @@
       <a
         class="navigation__link"
         routerLink="/"
-        fragment="funciones"
+        fragment="ejercicios"
         (click)="closeMenu()"
       >
-        Funciones
+        Ejercicios
       </a>
 
       <a
@@ -62,11 +62,21 @@
       </a>
 
       <a
-        class="button button--primary navigation__login"
+        class="navigation__link"
         routerLink="/login"
+        routerLinkActive="navigation__link--active"
+        ariaCurrentWhenActive="page"
         (click)="closeMenu()"
       >
         Iniciar sesión
+      </a>
+
+      <a
+        class="button button--primary navigation__login"
+        routerLink="/registro"
+        (click)="closeMenu()"
+      >
+        Crear cuenta
       </a>
     </nav>
   </div>

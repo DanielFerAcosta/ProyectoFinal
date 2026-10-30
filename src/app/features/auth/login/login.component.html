@@ -69,6 +69,7 @@
             formControlName="email"
             autocomplete="username"
             placeholder="tu@correo.com"
+            required
             [attr.aria-invalid]="
               loginForm.controls.email.touched &&
               loginForm.controls.email.invalid
@@ -105,6 +106,7 @@
               formControlName="password"
               autocomplete="current-password"
               placeholder="Ingresa tu contraseña"
+              required
               [attr.aria-invalid]="
                 loginForm.controls.password.touched &&
                 loginForm.controls.password.invalid
@@ -148,6 +150,11 @@
           {{ message }}
         </p>
       </form>
+
+      <p class="auth-switch">
+        ¿No tienes cuenta?
+        <a routerLink="/registro">Regístrate</a>
+      </p>
 
       <div class="development-note">
         <span class="development-note__dot" aria-hidden="true"></span>

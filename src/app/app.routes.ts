@@ -19,6 +19,14 @@ export const routes: Routes = [
     title: 'Iniciar sesión | Entrena',
   },
   {
+    path: 'registro',
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then(
+        (component) => component.RegisterComponent,
+      ),
+    title: 'Crear cuenta | Entrena',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
