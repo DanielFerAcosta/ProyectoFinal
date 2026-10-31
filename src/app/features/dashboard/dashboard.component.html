@@ -1,17 +1,4 @@
-<header class="panel-header">
-  <div class="container panel-header__content">
-    <a class="panel-brand" routerLink="/">entrena.</a>
-
-    <button
-      class="button button--secondary"
-      type="button"
-      [disabled]="signingOut"
-      (click)="logout()"
-    >
-      {{ signingOut ? 'Cerrando...' : 'Cerrar sesión' }}
-    </button>
-  </div>
-</header>
+<app-navbar />
 
 <main class="container panel">
   <p class="panel__eyebrow">ÁREA PRIVADA</p>
@@ -40,5 +27,9 @@
     </section>
   }
 
-  <p class="panel__message" role="status">{{ message }}</p>
+  @if (message) {
+    <p class="panel__message" role="status">
+      {{ message }}
+    </p>
+  }
 </main>
