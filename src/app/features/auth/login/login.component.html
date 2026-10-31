@@ -142,8 +142,13 @@
           }
         </div>
 
-        <button class="button button--primary submit-button" type="submit">
-          Iniciar sesión
+        <button
+          class="button button--primary submit-button"
+          type="submit"
+          [disabled]="loading"
+          [attr.aria-busy]="loading"
+        >
+          {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
         </button>
 
         <p class="form-message" role="status">

@@ -119,3 +119,8 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
