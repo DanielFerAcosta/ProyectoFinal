@@ -7,19 +7,20 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 const passwordsMatchValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
   const password = control.get('password')?.value;
-  const confirmPassword = control.get('confirmPassword')?.value;
+  const confirmation = control.get('confirmPassword')?.value;
 
-  if (!password || !confirmPassword) {
+  if (!password || !confirmation) {
     return null;
   }
 
-  return password === confirmPassword
+  return password === confirmation
     ? null
     : { passwordsMismatch: true };
 };
@@ -33,9 +34,12 @@ const passwordsMatchValidator: ValidatorFn = (
 })
 export class RegisterComponent {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected showPassword = false;
   protected showConfirmPassword = false;
+  protected loading = false;
   protected message = '';
 
   protected readonly registerForm = this.formBuilder.nonNullable.group(
@@ -66,7 +70,11 @@ export class RegisterComponent {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  protected onSubmit(): void {
+  protected async onSubmit(): Promise<void> {
+    if (this.loading) {
+      return;
+    }
+
     this.message = '';
 
     if (this.registerForm.invalid) {
@@ -74,7 +82,33 @@ export class RegisterComponent {
       return;
     }
 
-    this.message =
-      'Los datos son válidos. La creación de cuentas estará disponible cuando conectemos Firebase. No se ha creado ninguna cuenta.';
+    const { name, email, password } = this.registerForm.getRawValue();
+
+    if (name.trim().length < 2) {
+      this.registerForm.controls.name.setErrors({ minlength: true });
+      this.registerForm.controls.name.markAsTouched();
+      return;
+    }
+
+    this.loading = true;
+
+    try {
+      const data = await this.auth.register(name, email, password);
+
+      this.registerForm.controls.password.reset();
+      this.registerForm.controls.confirmPassword.reset();
+
+      if (data.session) {
+        await this.router.navigateByUrl('/panel');
+      } else {
+        this.message =
+          'Si el registro puede completarse con este correo, recibirás un mensaje de confirmación. Revisa tu bandeja y spam. Si ya tenías cuenta, inicia sesión.';
+      }
+    } catch {
+      this.message =
+        'No fue posible completar el registro. Revisa los datos, la conexión e inténtalo más tarde.';
+    } finally {
+      this.loading = false;
+    }
   }
 }

@@ -61,23 +61,35 @@
         Cómo funciona
       </a>
 
-      <a
-        class="navigation__link"
-        routerLink="/login"
-        routerLinkActive="navigation__link--active"
-        ariaCurrentWhenActive="page"
-        (click)="closeMenu()"
-      >
-        Iniciar sesión
-      </a>
+      @if (auth.user()) {
+        <a
+          class="button button--primary navigation__login"
+          routerLink="/panel"
+          routerLinkActive="navigation__link--active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+        >
+          Mi panel
+        </a>
+      } @else {
+        <a
+          class="navigation__link"
+          routerLink="/login"
+          routerLinkActive="navigation__link--active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+        >
+          Iniciar sesión
+        </a>
 
-      <a
-        class="button button--primary navigation__login"
-        routerLink="/registro"
-        (click)="closeMenu()"
-      >
-        Crear cuenta
-      </a>
+        <a
+          class="button button--primary navigation__login"
+          routerLink="/registro"
+          (click)="closeMenu()"
+        >
+          Crear cuenta
+        </a>
+      }
     </nav>
   </div>
 </header>

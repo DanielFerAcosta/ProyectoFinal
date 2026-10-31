@@ -247,8 +247,13 @@
           }
         </div>
 
-        <button class="button button--primary submit-button" type="submit">
-          Crear cuenta
+        <button
+          class="button button--primary submit-button"
+          type="submit"
+          [disabled]="loading"
+          [attr.aria-busy]="loading"
+        >
+          {{ loading ? 'Procesando...' : 'Crear cuenta' }}
         </button>
 
         <p class="form-message" role="status">

@@ -4,7 +4,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,8 +16,11 @@ import { RouterLink } from '@angular/router';
 })
 export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected showPassword = false;
+  protected loading = false;
   protected message = '';
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
@@ -28,7 +32,11 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  protected onSubmit(): void {
+  protected async onSubmit(): Promise<void> {
+    if (this.loading) {
+      return;
+    }
+
     this.message = '';
 
     if (this.loginForm.invalid) {
@@ -36,7 +44,20 @@ export class LoginComponent {
       return;
     }
 
-    this.message =
-      'El formulario es válido. El inicio de sesión estará disponible cuando conectemos Firebase.';
+    this.loading = true;
+
+    try {
+      const { email, password } = this.loginForm.getRawValue();
+
+      await this.auth.login(email, password);
+      this.loginForm.controls.password.reset();
+
+      await this.router.navigateByUrl('/panel');
+    } catch {
+      this.message =
+        'No fue posible iniciar sesión. Revisa tus datos, la confirmación del correo y tu conexión.';
+    } finally {
+      this.loading = false;
+    }
   }
 }

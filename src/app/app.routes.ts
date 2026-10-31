@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -27,7 +28,17 @@ export const routes: Routes = [
     title: 'Crear cuenta | Entrena',
   },
   {
+    path: 'panel',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(
+        (component) => component.DashboardComponent,
+      ),
+    title: 'Mi panel | Entrena',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
 ];
+
