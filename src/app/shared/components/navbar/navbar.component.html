@@ -16,14 +16,19 @@
       aria-controls="main-navigation"
       [attr.aria-expanded]="menuOpen()"
       [attr.aria-label]="
-        menuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'
+        menuOpen()
+          ? 'Cerrar menú de navegación'
+          : 'Abrir menú de navegación'
       "
       (click)="toggleMenu()"
     >
       <span aria-hidden="true">
         {{ menuOpen() ? '✕' : '☰' }}
       </span>
-      <span>{{ menuOpen() ? 'Cerrar' : 'Menú' }}</span>
+
+      <span>
+        {{ menuOpen() ? 'Cerrar' : 'Menú' }}
+      </span>
     </button>
 
     <nav
@@ -62,35 +67,63 @@
         Cómo funciona
       </a>
 
-      @if (auth.user()) {
-        <a
-          class="button button--primary navigation__login"
-          routerLink="/panel"
-          routerLinkActive="navigation__link--active"
-          ariaCurrentWhenActive="page"
-          (click)="closeMenu()"
-        >
-          Mi panel
-        </a>
+      @if (!authReady()) {
+        <span class="navigation__link" role="status">
+          Cargando sesión…
+        </span>
       } @else {
-        <a
-          class="navigation__link"
-          routerLink="/login"
-          routerLinkActive="navigation__link--active"
-          ariaCurrentWhenActive="page"
-          (click)="closeMenu()"
-        >
-          Iniciar sesión
-        </a>
+        @if (auth.user()) {
+          <a
+            class="navigation__link"
+            routerLink="/panel"
+            routerLinkActive="navigation__link--active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+          >
+            Mi panel
+          </a>
 
-        <a
-          class="button button--primary navigation__login"
-          routerLink="/registro"
-          (click)="closeMenu()"
-        >
-          Crear cuenta
-        </a>
+          <button
+            class="button button--primary navigation__login"
+            type="button"
+            [disabled]="loggingOut()"
+            [attr.aria-busy]="loggingOut()"
+            (click)="logout()"
+          >
+            {{
+              loggingOut()
+                ? 'Cerrando sesión…'
+                : 'Cerrar sesión'
+            }}
+          </button>
+        } @else {
+          <a
+            class="navigation__link"
+            routerLink="/login"
+            routerLinkActive="navigation__link--active"
+            ariaCurrentWhenActive="page"
+            (click)="closeMenu()"
+          >
+            Iniciar sesión
+          </a>
+
+          <a
+            class="button button--primary navigation__login"
+            routerLink="/registro"
+            (click)="closeMenu()"
+          >
+            Crear cuenta
+          </a>
+        }
       }
     </nav>
   </div>
+
+  @if (logoutError()) {
+    <div class="container">
+      <p role="alert">
+        {{ logoutError() }}
+      </p>
+    </div>
+  }
 </header>
