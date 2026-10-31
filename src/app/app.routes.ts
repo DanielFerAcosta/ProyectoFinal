@@ -27,6 +27,14 @@ export const routes: Routes = [
     title: 'Crear cuenta | Entrena',
   },
   {
+    path: 'ejercicios',
+    loadComponent: () =>
+      import('./features/catalog/catalog.component').then(
+        (component) => component.CatalogComponent,
+      ),
+    title: 'Catálogo de ejercicios | Entrena',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

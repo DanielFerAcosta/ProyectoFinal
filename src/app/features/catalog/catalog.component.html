@@ -1,0 +1,390 @@
+<app-navbar />
+
+<main class="container catalog-page">
+  <header class="catalog-heading">
+    <p class="eyebrow">EXPLORA EL CATÁLOGO</p>
+
+    <h1>Ejercicios para conocer tus opciones.</h1>
+
+    <p class="catalog-heading__description">
+      Busca por nombre, filtra el catálogo y explora
+      las conexiones entre ejercicios.
+    </p>
+
+    <p class="demo-notice">
+      Catálogo de desarrollo: datos locales, niveles provisionales
+      y conexiones de demostración. Las conexiones no representan
+      equivalencias ni recomendaciones de entrenamiento.
+    </p>
+  </header>
+
+  <section class="filters" aria-labelledby="filters-title">
+    <div class="filters__header">
+      <h2 id="filters-title">Buscar y filtrar ejercicios</h2>
+
+      <button
+        class="reset-button"
+        type="button"
+        [disabled]="!hasActiveFilters()"
+        (click)="resetFilters()"
+      >
+        Limpiar filtros
+      </button>
+    </div>
+
+    <div
+      class="filter-field search-field"
+      (keydown.escape)="closeSuggestions()"
+    >
+      <label for="exercise-search">Buscar por nombre</label>
+
+      <input
+        #searchInput
+        id="exercise-search"
+        type="search"
+        placeholder="Ejemplo: remo, jalón o sentadilla"
+        autocomplete="off"
+        aria-describedby="exercise-search-help"
+        [value]="searchQuery()"
+        (input)="changeSearch($event)"
+        (focus)="openSuggestions()"
+      />
+
+      <p id="exercise-search-help" class="search-help">
+        Escribe el inicio del nombre. Puedes buscar sin tildes.
+        Usa Tab para recorrer las sugerencias y Enter para elegir.
+        Pulsa Escape para ocultarlas.
+      </p>
+
+      @if (searchSuggestions().length > 0) {
+        <section
+          class="search-suggestions"
+          aria-labelledby="search-suggestions-title"
+        >
+          <h3
+            id="search-suggestions-title"
+            class="search-suggestions__title"
+          >
+            Coincidencias por nombre en el catálogo
+          </h3>
+
+          <ul class="search-suggestions__list">
+            @for (
+              exercise of searchSuggestions();
+              track exercise.id
+            ) {
+              <li>
+                <button
+                  class="search-suggestions__option"
+                  type="button"
+                  (click)="
+                    searchInput.focus();
+                    selectSuggestion(exercise.name)
+                  "
+                >
+                  <span class="search-suggestions__name">
+                    {{ exercise.name }}
+                  </span>
+
+                  <span class="search-suggestions__equipment">
+                    {{ equipmentLabels[exercise.equipment] }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+
+          <p class="search-suggestions__note">
+            Los filtros seleccionados se aplican a los resultados de abajo.
+          </p>
+        </section>
+      }
+    </div>
+
+    <div class="filters__grid">
+      <div class="filter-field">
+        <label for="equipment-filter">Equipamiento</label>
+
+        <select
+          id="equipment-filter"
+          [value]="equipment()"
+          (change)="changeEquipment($event)"
+        >
+          <option value="all">Todos los equipos</option>
+          <option value="bodyweight">Peso corporal</option>
+          <option value="dumbbells">Mancuernas</option>
+          <option value="machine">Máquina</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="muscle-filter">Grupo muscular</label>
+
+        <select
+          id="muscle-filter"
+          [value]="muscleGroup()"
+          (change)="changeMuscleGroup($event)"
+        >
+          <option value="all">Todos los grupos</option>
+          <option value="legs">Piernas</option>
+          <option value="chest">Pecho</option>
+          <option value="back">Espalda</option>
+          <option value="arms">Brazos</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="level-filter">Nivel</label>
+
+        <select
+          id="level-filter"
+          [value]="level()"
+          (change)="changeLevel($event)"
+        >
+          <option value="all">Todos los niveles</option>
+          <option value="beginner">Inicial</option>
+          <option value="intermediate">Intermedio</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="results" aria-labelledby="results-title">
+    <div class="results__header">
+      <h2 id="results-title">Resultados</h2>
+
+      <p role="status">
+        {{ filteredExercises().length }}
+        {{
+          filteredExercises().length === 1
+            ? 'ejercicio encontrado'
+            : 'ejercicios encontrados'
+        }}
+      </p>
+    </div>
+
+    <div class="exercise-grid">
+      @for (exercise of filteredExercises(); track exercise.id) {
+        <article
+          class="exercise-card"
+          [class.exercise-card--selected]="
+            selectedExerciseId() === exercise.id
+          "
+          [attr.aria-labelledby]="'exercise-' + exercise.id"
+        >
+          <div class="exercise-card__header">
+            <span class="muscle-label">
+              {{ muscleLabels[exercise.muscleGroup] }}
+            </span>
+
+            <span class="level-badge">
+              {{ levelLabels[exercise.level] }}
+            </span>
+          </div>
+
+          <h3 [id]="'exercise-' + exercise.id">
+            {{ exercise.name }}
+          </h3>
+
+          <p class="exercise-card__description">
+            {{ exercise.description }}
+          </p>
+
+          <div class="exercise-card__footer">
+            <span>Equipamiento</span>
+
+            <strong>
+              {{ equipmentLabels[exercise.equipment] }}
+            </strong>
+          </div>
+
+          <button
+            class="alternatives-button"
+            type="button"
+            [attr.aria-expanded]="
+              selectedExerciseId() === exercise.id
+            "
+            [attr.aria-controls]="
+              selectedExerciseId() === exercise.id
+                ? 'alternatives-panel'
+                : null
+            "
+            [attr.aria-label]="
+              (selectedExerciseId() === exercise.id
+                ? 'Ocultar alternativas de '
+                : 'Ver alternativas de ') + exercise.name
+            "
+            (click)="toggleAlternatives(exercise.id)"
+          >
+            {{
+              selectedExerciseId() === exercise.id
+                ? 'Ocultar alternativas'
+                : 'Ver alternativas'
+            }}
+          </button>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <h3>
+            No encontramos ejercicios con esa búsqueda y esos filtros.
+          </h3>
+
+          <p>
+            Prueba con el inicio de otro nombre o limpia los filtros
+            para ver todos los ejemplos.
+          </p>
+
+          <button
+            class="button button--primary"
+            type="button"
+            (click)="resetFilters()"
+          >
+            Ver todos los ejercicios
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (selectedExercise(); as selected) {
+    <section
+      id="alternatives-panel"
+      class="alternatives-panel"
+      aria-labelledby="alternatives-title"
+    >
+      <header class="alternatives-panel__header">
+        <div>
+          <p class="eyebrow">CONEXIONES DEL GRAFO</p>
+
+          <h2 id="alternatives-title">
+            Alternativas de demostración para {{ selected.name }}
+          </h2>
+        </div>
+      </header>
+
+      <p class="alternatives-panel__description">
+        Se muestran únicamente los ejercicios conectados directamente
+        con este nodo. Estas relaciones son ejemplos de desarrollo,
+        no indicaciones para sustituir ejercicios en una rutina.
+      </p>
+
+      @if (connectedExercises().length > 0) {
+        <div class="alternatives-filters">
+          <div class="filter-field">
+            <label for="alternative-equipment">
+              Equipamiento de la alternativa
+            </label>
+
+            <select
+              id="alternative-equipment"
+              [value]="alternativeEquipment()"
+              (change)="changeAlternativeEquipment($event)"
+            >
+              <option value="all">Todos los equipos</option>
+              <option value="bodyweight">Peso corporal</option>
+              <option value="dumbbells">Mancuernas</option>
+              <option value="machine">Máquina</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="alternative-level">
+              Nivel de la alternativa
+            </label>
+
+            <select
+              id="alternative-level"
+              [value]="alternativeLevel()"
+              (change)="changeAlternativeLevel($event)"
+            >
+              <option value="all">Todos los niveles</option>
+              <option value="beginner">Inicial</option>
+              <option value="intermediate">Intermedio</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="alternatives-summary">
+          <p role="status">
+            {{ filteredAlternatives().length }}
+            {{
+              filteredAlternatives().length === 1
+                ? 'alternativa encontrada'
+                : 'alternativas encontradas'
+            }}
+          </p>
+
+          <button
+            class="reset-button"
+            type="button"
+            [disabled]="!hasAlternativeFilters()"
+            (click)="resetAlternativeFilters()"
+          >
+            Limpiar filtros de alternativas
+          </button>
+        </div>
+
+        <div class="alternative-grid">
+          @for (
+            alternative of filteredAlternatives();
+            track alternative.id
+          ) {
+            <article class="alternative-card">
+              <span class="muscle-label">
+                {{ muscleLabels[alternative.muscleGroup] }}
+              </span>
+
+              <h3>{{ alternative.name }}</h3>
+
+              <p>{{ alternative.description }}</p>
+
+              <dl class="alternative-card__details">
+                <div>
+                  <dt>Equipamiento</dt>
+                  <dd>
+                    {{ equipmentLabels[alternative.equipment] }}
+                  </dd>
+                </div>
+
+                <div>
+                  <dt>Nivel</dt>
+                  <dd>
+                    {{ levelLabels[alternative.level] }}
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          } @empty {
+            <div class="empty-state">
+              <h3>
+                Ninguna conexión coincide con estos filtros.
+              </h3>
+
+              <p>
+                El ejercicio tiene conexiones, pero no cumplen
+                el equipamiento o nivel seleccionados.
+              </p>
+
+              <button
+                class="reset-button"
+                type="button"
+                (click)="resetAlternativeFilters()"
+              >
+                Mostrar todas sus conexiones
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>Este ejercicio todavía no tiene conexiones.</h3>
+
+          <p>
+            No se definieron alternativas de demostración
+            para este nodo del catálogo.
+          </p>
+        </div>
+      }
+    </section>
+  }
+</main>
