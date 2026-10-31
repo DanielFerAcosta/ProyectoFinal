@@ -37,8 +37,15 @@ export const routes: Routes = [
     title: 'Mi panel | Entrena',
   },
   {
+    path: 'ejercicios',
+    loadComponent: () =>
+      import('./features/catalog/catalog.component').then(
+        (component) => component.CatalogComponent,
+      ),
+    title: 'Catálogo de ejercicios | Entrena',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
 ];
-
