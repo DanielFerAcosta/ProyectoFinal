@@ -1,0 +1,197 @@
+<app-navbar />
+
+<main class="container routines">
+  <header class="routines__header">
+    <p class="routines__eyebrow">ÁREA PRIVADA</p>
+
+    <h1>Mis rutinas</h1>
+
+    <p class="routines__description">
+      Crea rutinas y organiza sus ejercicios, series y repeticiones.
+    </p>
+
+    <a class="routines__back" routerLink="/panel">
+      Volver a mi panel
+    </a>
+  </header>
+
+  <section
+    class="routine-form"
+    aria-labelledby="create-routine-title"
+  >
+    <h2 id="create-routine-title">Crear rutina</h2>
+
+    <form
+      #routineForm="ngForm"
+      (ngSubmit)="saveRoutine(routineForm)"
+    >
+      <fieldset
+        class="routine-form__fields"
+        [disabled]="saving()"
+      >
+        <legend class="routine-form__legend">
+          Datos de la nueva rutina
+        </legend>
+
+        <div class="routine-form__field">
+          <label for="routine-name">Nombre de la rutina</label>
+
+          <input
+            id="routine-name"
+            name="routineName"
+            type="text"
+            required
+            maxlength="80"
+            placeholder="Por ejemplo: Rutina del lunes"
+            [(ngModel)]="routineName"
+          />
+        </div>
+
+        <p class="routine-form__help">
+          Selecciona los ejercicios e indica sus series y repeticiones.
+          Los valores iniciales son campos de ejemplo, no una
+          recomendación de entrenamiento.
+        </p>
+
+        <div class="routine-form__exercises">
+          @for (exercise of exerciseDrafts; track exercise.exercise_id) {
+            <div class="exercise-option">
+              <label class="exercise-option__selection">
+                <input
+                  type="checkbox"
+                  [name]="'selected-' + exercise.exercise_id"
+                  [(ngModel)]="exercise.selected"
+                />
+
+                <span>{{ exercise.name }}</span>
+              </label>
+
+              @if (exercise.selected) {
+                <div class="exercise-option__details">
+                  <div class="routine-form__field">
+                    <label
+                      [for]="'sets-' + exercise.exercise_id"
+                    >
+                      Series
+                    </label>
+
+                    <input
+                      [id]="'sets-' + exercise.exercise_id"
+                      [name]="'sets-' + exercise.exercise_id"
+                      type="number"
+                      required
+                      min="1"
+                      max="20"
+                      step="1"
+                      [(ngModel)]="exercise.sets"
+                    />
+                  </div>
+
+                  <div class="routine-form__field">
+                    <label
+                      [for]="'repetitions-' + exercise.exercise_id"
+                    >
+                      Repeticiones por serie
+                    </label>
+
+                    <input
+                      [id]="'repetitions-' + exercise.exercise_id"
+                      [name]="'repetitions-' + exercise.exercise_id"
+                      type="number"
+                      required
+                      min="1"
+                      max="100"
+                      step="1"
+                      [(ngModel)]="exercise.repetitions"
+                    />
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          class="button button--primary"
+          type="submit"
+          [disabled]="saving()"
+          [attr.aria-busy]="saving()"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar rutina' }}
+        </button>
+      </fieldset>
+
+      @if (formError()) {
+        <p class="routine-form__error" role="alert">
+          {{ formError() }}
+        </p>
+      }
+
+      @if (successMessage()) {
+        <p class="routine-form__success" role="status">
+          {{ successMessage() }}
+        </p>
+      }
+    </form>
+  </section>
+
+  <section aria-labelledby="saved-routines-title">
+    <h2 id="saved-routines-title">Rutinas guardadas</h2>
+
+    @if (loading()) {
+      <p role="status">Cargando rutinas...</p>
+    } @else if (errorMessage()) {
+      <div class="routines__notice">
+        <p role="alert">{{ errorMessage() }}</p>
+
+        <button
+          class="button button--secondary"
+          type="button"
+          (click)="loadRoutines()"
+        >
+          Actualizar listado
+        </button>
+      </div>
+    } @else if (routines().length === 0) {
+      <div class="routines__notice">
+        <h3>Todavía no tienes rutinas</h3>
+
+        <p>
+          Utiliza el formulario para crear la primera.
+        </p>
+      </div>
+    } @else {
+      <div class="routines__list">
+        @for (routine of routines(); track routine.id) {
+          <article class="routine-card">
+            <h3>{{ routine.name }}</h3>
+
+            <p class="routine-card__date">
+              Creada el {{ routine.created_at | date:'dd/MM/yyyy' }}
+            </p>
+
+            @if (routine.exercises.length === 0) {
+              <p>Esta rutina todavía no tiene ejercicios.</p>
+            } @else {
+              <ol class="routine-card__exercises">
+                @for (exercise of routine.exercises; track exercise.id) {
+                  <li>
+                    <h4>
+                      {{ getExerciseName(exercise.exercise_id) }}
+                    </h4>
+
+                    <p>
+                      {{ exercise.sets }} series
+                      ·
+                      {{ exercise.repetitions }} repeticiones
+                    </p>
+                  </li>
+                }
+              </ol>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>
+</main>
