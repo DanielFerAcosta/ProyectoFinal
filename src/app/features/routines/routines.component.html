@@ -27,7 +27,7 @@
     >
       <fieldset
         class="routine-form__fields"
-        [disabled]="saving()"
+        [disabled]="saving() || deletingId() !== null || loading()"
       >
         <legend class="routine-form__legend">
           Datos de la nueva rutina
@@ -69,9 +69,7 @@
               @if (exercise.selected) {
                 <div class="exercise-option__details">
                   <div class="routine-form__field">
-                    <label
-                      [for]="'sets-' + exercise.exercise_id"
-                    >
+                    <label [for]="'sets-' + exercise.exercise_id">
                       Series
                     </label>
 
@@ -88,9 +86,7 @@
                   </div>
 
                   <div class="routine-form__field">
-                    <label
-                      [for]="'repetitions-' + exercise.exercise_id"
-                    >
+                    <label [for]="'repetitions-' + exercise.exercise_id">
                       Repeticiones por serie
                     </label>
 
@@ -114,7 +110,7 @@
         <button
           class="button button--primary"
           type="submit"
-          [disabled]="saving()"
+          [disabled]="saving() || deletingId() !== null || loading()"
           [attr.aria-busy]="saving()"
         >
           {{ saving() ? 'Guardando...' : 'Guardar rutina' }}
@@ -136,21 +132,30 @@
   </section>
 
   <section aria-labelledby="saved-routines-title">
-    <h2 id="saved-routines-title">Rutinas guardadas</h2>
+    <div class="routines__list-header">
+      <h2 id="saved-routines-title">Rutinas guardadas</h2>
+
+      <button
+        class="button button--secondary"
+        type="button"
+        [disabled]="loading() || saving() || deletingId() !== null"
+        (click)="loadRoutines()"
+      >
+        {{ loading() ? 'Actualizando...' : 'Actualizar listado' }}
+      </button>
+    </div>
+
+    @if (deleteSuccess()) {
+      <p class="routine-form__success" role="status">
+        {{ deleteSuccess() }}
+      </p>
+    }
 
     @if (loading()) {
       <p role="status">Cargando rutinas...</p>
     } @else if (errorMessage()) {
       <div class="routines__notice">
         <p role="alert">{{ errorMessage() }}</p>
-
-        <button
-          class="button button--secondary"
-          type="button"
-          (click)="loadRoutines()"
-        >
-          Actualizar listado
-        </button>
       </div>
     } @else if (routines().length === 0) {
       <div class="routines__notice">
@@ -189,6 +194,68 @@
                 }
               </ol>
             }
+
+            <div class="routine-card__actions">
+              @if (pendingDeleteId() === routine.id) {
+                <section
+                  class="delete-confirmation"
+                  [attr.aria-labelledby]="'delete-title-' + routine.id"
+                  [attr.aria-busy]="deletingId() === routine.id"
+                >
+                  <h4 [id]="'delete-title-' + routine.id">
+                    ¿Eliminar "{{ routine.name }}"?
+                  </h4>
+
+                  <p>
+                    Se eliminarán la rutina y los ejercicios asociados
+                    a ella. El catálogo de ejercicios no se modificará.
+                    Esta acción no se puede deshacer.
+                  </p>
+
+                  <div class="delete-confirmation__buttons">
+                    <button
+                      class="button button--secondary"
+                      type="button"
+                      [disabled]="deletingId() !== null"
+                      (click)="cancelDelete()"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      class="button routine-delete-button"
+                      type="button"
+                      [disabled]="deletingId() !== null || saving()"
+                      (click)="confirmDelete(routine)"
+                    >
+                      {{
+                        deletingId() === routine.id
+                          ? 'Eliminando...'
+                          : 'Sí, eliminar'
+                      }}
+                    </button>
+                  </div>
+
+                  @if (deleteError()) {
+                    <p class="routine-form__error" role="alert">
+                      {{ deleteError() }}
+                    </p>
+                  }
+                </section>
+              } @else {
+                <button
+                  class="button routine-delete-button"
+                  type="button"
+                  [disabled]="
+                    saving() || loading() || deletingId() !== null
+                  "
+                  [attr.aria-label]="'Eliminar rutina ' + routine.name"
+                  (click)="requestDelete(routine)"
+                >
+                  Eliminar rutina
+                </button>
+              }
+            </div>
           </article>
         }
       </div>

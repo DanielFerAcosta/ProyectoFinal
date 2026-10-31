@@ -141,4 +141,41 @@ export class RoutineService {
 
     return data;
   }
+
+  async deleteRoutine(routineId: string): Promise<void> {
+    await this.auth.ready;
+
+    const currentUser = this.auth.user();
+
+    if (!currentUser) {
+      throw new Error(
+        'Debes iniciar sesión para eliminar una rutina.',
+      );
+    }
+
+    const id = routineId.trim();
+
+    if (!id) {
+      throw new Error(
+        'El identificador de la rutina no es válido.',
+      );
+    }
+
+    const { data, error } = await this.supabase
+      .from('routines')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', currentUser.id)
+      .select('id');
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data || data.length !== 1) {
+      throw new Error(
+        'No se pudo eliminar la rutina. Puede que ya no exista o que no tengas permiso para eliminarla.',
+      );
+    }
+  }
 }
