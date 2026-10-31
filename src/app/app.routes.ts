@@ -45,6 +45,15 @@ export const routes: Routes = [
     title: 'Catálogo de ejercicios | Entrena',
   },
   {
+    path: 'rutinas',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/routines/routines.component').then(
+        (component) => component.RoutinesComponent,
+      ),
+    title: 'Mis rutinas | Entrena',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
