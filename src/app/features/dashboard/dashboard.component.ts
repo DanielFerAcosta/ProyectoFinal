@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
   effect,
@@ -19,7 +20,9 @@ import {
 })
 export class DashboardComponent implements OnInit {
   protected readonly auth = inject(AuthService);
+
   private readonly router = inject(Router);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   protected profile: UserProfile | null = null;
   protected loading = true;
@@ -37,11 +40,14 @@ export class DashboardComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       this.profile = await this.auth.getProfile();
-    } catch {
+    } catch (error: unknown) {
+      console.error('Error al cargar el perfil:', error);
+
       this.message =
         'No se pudo cargar tu perfil. Comprueba la conexión y la configuración de la base de datos.';
     } finally {
       this.loading = false;
+      this.changeDetector.markForCheck();
     }
   }
 
@@ -56,11 +62,15 @@ export class DashboardComponent implements OnInit {
     try {
       await this.auth.logout();
       await this.router.navigateByUrl('/login');
-    } catch {
-      this.message =
-        'No se pudo cerrar la sesión. Inténtalo nuevamente.';
+    } catch (error: unknown) {
+      console.error('Error al cerrar la sesión:', error);
+
+      this.message = this.auth.user()
+        ? 'No se pudo cerrar la sesión. Inténtalo nuevamente.'
+        : 'La sesión se cerró, pero no se pudo completar la navegación.';
     } finally {
       this.signingOut = false;
+      this.changeDetector.markForCheck();
     }
   }
 }
