@@ -6,6 +6,7 @@ import {
   ExerciseLevel,
   MuscleGroup,
 } from './models/exercise.model';
+import { ExerciseTrie } from './structures/exercise-trie';
 
 type FilterValue<T> = T | 'all';
 
@@ -17,6 +18,11 @@ type FilterValue<T> = T | 'all';
   styleUrl: './catalog.component.scss',
 })
 export class CatalogComponent {
+  private readonly exerciseTrie = new ExerciseTrie();
+
+  protected readonly searchQuery = signal('');
+  protected readonly suggestionsOpen = signal(false);
+
   protected readonly equipment = signal<FilterValue<Equipment>>('all');
   protected readonly level = signal<FilterValue<ExerciseLevel>>('all');
   protected readonly muscleGroup = signal<FilterValue<MuscleGroup>>('all');
@@ -39,8 +45,34 @@ export class CatalogComponent {
     arms: 'Brazos',
   };
 
-  protected readonly filteredExercises = computed(() =>
-    EXERCISES.filter((exercise) => {
+  protected readonly matchingExerciseIds = computed(
+    () =>
+      new Set(
+        this.exerciseTrie.searchByPrefix(this.searchQuery()),
+      ),
+  );
+
+  protected readonly searchSuggestions = computed(() => {
+    if (
+      !this.suggestionsOpen() ||
+      this.searchQuery().trim() === ''
+    ) {
+      return [];
+    }
+
+    const matchingIds = this.matchingExerciseIds();
+
+    return EXERCISES
+      .filter((exercise) => matchingIds.has(exercise.id))
+      .slice(0, 5);
+  });
+
+  protected readonly filteredExercises = computed(() => {
+    const matchingIds = this.matchingExerciseIds();
+
+    return EXERCISES.filter((exercise) => {
+      const matchesSearch = matchingIds.has(exercise.id);
+
       const matchesEquipment =
         this.equipment() === 'all' ||
         exercise.equipment === this.equipment();
@@ -53,16 +85,48 @@ export class CatalogComponent {
         this.muscleGroup() === 'all' ||
         exercise.muscleGroup === this.muscleGroup();
 
-      return matchesEquipment && matchesLevel && matchesMuscle;
-    }),
-  );
+      return (
+        matchesSearch &&
+        matchesEquipment &&
+        matchesLevel &&
+        matchesMuscle
+      );
+    });
+  });
 
   protected readonly hasActiveFilters = computed(
     () =>
+      this.searchQuery().trim() !== '' ||
       this.equipment() !== 'all' ||
       this.level() !== 'all' ||
       this.muscleGroup() !== 'all',
   );
+
+  constructor() {
+    for (const exercise of EXERCISES) {
+      this.exerciseTrie.insert(exercise.name, exercise.id);
+    }
+  }
+
+  protected changeSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.searchQuery.set(input.value);
+    this.suggestionsOpen.set(true);
+  }
+
+  protected openSuggestions(): void {
+    this.suggestionsOpen.set(true);
+  }
+
+  protected closeSuggestions(): void {
+    this.suggestionsOpen.set(false);
+  }
+
+  protected selectSuggestion(name: string): void {
+    this.searchQuery.set(name);
+    this.suggestionsOpen.set(false);
+  }
 
   protected changeEquipment(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
@@ -104,6 +168,8 @@ export class CatalogComponent {
   }
 
   protected resetFilters(): void {
+    this.searchQuery.set('');
+    this.suggestionsOpen.set(false);
     this.equipment.set('all');
     this.level.set('all');
     this.muscleGroup.set('all');

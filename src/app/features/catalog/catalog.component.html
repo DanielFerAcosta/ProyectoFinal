@@ -7,8 +7,8 @@
     <h1>Ejercicios para conocer tus opciones.</h1>
 
     <p class="catalog-heading__description">
-      Filtra los ejemplos según el equipamiento, el grupo muscular
-      y la categoría de nivel.
+      Busca por nombre y filtra los ejemplos según el equipamiento,
+      el grupo muscular y la categoría de nivel.
     </p>
 
     <p class="demo-notice">
@@ -19,7 +19,7 @@
 
   <section class="filters" aria-labelledby="filters-title">
     <div class="filters__header">
-      <h2 id="filters-title">Filtrar ejercicios</h2>
+      <h2 id="filters-title">Buscar y filtrar ejercicios</h2>
 
       <button
         class="reset-button"
@@ -29,6 +29,75 @@
       >
         Limpiar filtros
       </button>
+    </div>
+
+    <div
+      class="filter-field search-field"
+      (keydown.escape)="closeSuggestions()"
+    >
+      <label for="exercise-search">Buscar por nombre</label>
+
+      <input
+        #searchInput
+        id="exercise-search"
+        type="search"
+        placeholder="Ejemplo: remo, jalón o sentadilla"
+        autocomplete="off"
+        aria-describedby="exercise-search-help"
+        [value]="searchQuery()"
+        (input)="changeSearch($event)"
+        (focus)="openSuggestions()"
+      />
+
+      <p id="exercise-search-help" class="search-help">
+        Escribe el inicio del nombre. Puedes buscar sin tildes.
+        Usa Tab para recorrer las sugerencias y Enter para elegir.
+        Pulsa Escape para ocultarlas.
+      </p>
+
+      @if (searchSuggestions().length > 0) {
+        <section
+          class="search-suggestions"
+          aria-labelledby="search-suggestions-title"
+        >
+          <h3
+            id="search-suggestions-title"
+            class="search-suggestions__title"
+          >
+            Coincidencias por nombre en el catálogo
+          </h3>
+
+          <ul class="search-suggestions__list">
+            @for (
+              exercise of searchSuggestions();
+              track exercise.id
+            ) {
+              <li>
+                <button
+                  class="search-suggestions__option"
+                  type="button"
+                  (click)="
+                    searchInput.focus();
+                    selectSuggestion(exercise.name)
+                  "
+                >
+                  <span class="search-suggestions__name">
+                    {{ exercise.name }}
+                  </span>
+
+                  <span class="search-suggestions__equipment">
+                    {{ equipmentLabels[exercise.equipment] }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+
+          <p class="search-suggestions__note">
+            Los filtros seleccionados se aplican a los resultados de abajo.
+          </p>
+        </section>
+      }
     </div>
 
     <div class="filters__grid">
@@ -119,6 +188,7 @@
 
           <div class="exercise-card__footer">
             <span>Equipamiento</span>
+
             <strong>
               {{ equipmentLabels[exercise.equipment] }}
             </strong>
@@ -126,10 +196,12 @@
         </article>
       } @empty {
         <div class="empty-state">
-          <h3>No encontramos ejercicios con esos filtros.</h3>
+          <h3>
+            No encontramos ejercicios con esa búsqueda y esos filtros.
+          </h3>
 
           <p>
-            Cambia alguna selección o limpia los filtros
+            Prueba con el inicio de otro nombre o limpia los filtros
             para ver todos los ejemplos.
           </p>
 
