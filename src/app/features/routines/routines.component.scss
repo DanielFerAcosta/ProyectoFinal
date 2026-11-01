@@ -421,4 +421,46 @@
       width: 100%;
     }
   }
+
+  .routine-history {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+
+    &__count {
+      color: #b9bdb3;
+      font-size: 0.875rem;
+    }
+
+    &__help {
+      margin: 0 0 0.75rem;
+      color: #b9bdb3;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    &__message {
+      margin: 0 0 1rem;
+      color: #a3e635;
+      font-size: 0.875rem;
+      line-height: 1.6;
+
+      &:empty {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    .routine-history {
+      align-items: stretch;
+      flex-direction: column;
+
+      .button {
+        width: 100%;
+      }
+    }
+  }
 }

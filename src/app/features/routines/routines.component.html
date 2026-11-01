@@ -10,28 +10,18 @@
       Crea rutinas y organiza sus ejercicios, series y repeticiones.
     </p>
 
-    <a class="routines__back" routerLink="/panel">
-      Volver a mi panel
-    </a>
+    <a class="routines__back" routerLink="/panel"> Volver a mi panel </a>
   </header>
 
-  <section
-    class="routine-form"
-    aria-labelledby="create-routine-title"
-  >
+  <section class="routine-form" aria-labelledby="create-routine-title">
     <h2 id="create-routine-title">Crear rutina</h2>
 
-    <form
-      #routineForm="ngForm"
-      (ngSubmit)="saveRoutine(routineForm)"
-    >
+    <form #routineForm="ngForm" (ngSubmit)="saveRoutine(routineForm)">
       <fieldset
         class="routine-form__fields"
         [disabled]="saving() || deletingId() !== null || loading()"
       >
-        <legend class="routine-form__legend">
-          Datos de la nueva rutina
-        </legend>
+        <legend class="routine-form__legend">Datos de la nueva rutina</legend>
 
         <div class="routine-form__field">
           <label for="routine-name">Nombre de la rutina</label>
@@ -48,9 +38,30 @@
         </div>
 
         <p class="routine-form__help">
-          Selecciona los ejercicios e indica sus series y repeticiones.
-          Los valores iniciales son campos de ejemplo, no una
-          recomendación de entrenamiento.
+          Selecciona los ejercicios e indica sus series y repeticiones. Los valores iniciales son
+          campos de ejemplo, no una recomendación de entrenamiento.
+        </p>
+
+        <div class="routine-history">
+          <button
+            class="button button--secondary"
+            type="button"
+            [disabled]="historySize() === 0 || saving() || deletingId() !== null || loading()"
+            (click)="undoSelection()"
+          >
+            Deshacer último cambio
+          </button>
+
+          <span class="routine-history__count"> Cambios disponibles: {{ historySize() }} </span>
+        </div>
+
+        <p class="routine-history__help">
+          Deshacer solo recupera la selección anterior de los ejercicios. No cambia el nombre, las
+          series ni las repeticiones.
+        </p>
+
+        <p class="routine-history__message" role="status">
+          {{ historyMessage() }}
         </p>
 
         <div class="routine-form__exercises">
@@ -60,18 +71,16 @@
                 <input
                   type="checkbox"
                   [name]="'selected-' + exercise.exercise_id"
-                  [(ngModel)]="exercise.selected"
+                  [ngModel]="exercise.selected"
+                  (ngModelChange)="changeExerciseSelection(exercise, $event)"
                 />
-
                 <span>{{ exercise.name }}</span>
               </label>
 
               @if (exercise.selected) {
                 <div class="exercise-option__details">
                   <div class="routine-form__field">
-                    <label [for]="'sets-' + exercise.exercise_id">
-                      Series
-                    </label>
+                    <label [for]="'sets-' + exercise.exercise_id"> Series </label>
 
                     <input
                       [id]="'sets-' + exercise.exercise_id"
@@ -161,9 +170,7 @@
       <div class="routines__notice">
         <h3>Todavía no tienes rutinas</h3>
 
-        <p>
-          Utiliza el formulario para crear la primera.
-        </p>
+        <p>Utiliza el formulario para crear la primera.</p>
       </div>
     } @else {
       <div class="routines__list">
@@ -172,7 +179,7 @@
             <h3>{{ routine.name }}</h3>
 
             <p class="routine-card__date">
-              Creada el {{ routine.created_at | date:'dd/MM/yyyy' }}
+              Creada el {{ routine.created_at | date: 'dd/MM/yyyy' }}
             </p>
 
             @if (routine.exercises.length === 0) {
@@ -185,11 +192,7 @@
                       {{ getExerciseName(exercise.exercise_id) }}
                     </h4>
 
-                    <p>
-                      {{ exercise.sets }} series
-                      ·
-                      {{ exercise.repetitions }} repeticiones
-                    </p>
+                    <p>{{ exercise.sets }} series · {{ exercise.repetitions }} repeticiones</p>
                   </li>
                 }
               </ol>
@@ -202,14 +205,11 @@
                   [attr.aria-labelledby]="'delete-title-' + routine.id"
                   [attr.aria-busy]="deletingId() === routine.id"
                 >
-                  <h4 [id]="'delete-title-' + routine.id">
-                    ¿Eliminar "{{ routine.name }}"?
-                  </h4>
+                  <h4 [id]="'delete-title-' + routine.id">¿Eliminar "{{ routine.name }}"?</h4>
 
                   <p>
-                    Se eliminarán la rutina y los ejercicios asociados
-                    a ella. El catálogo de ejercicios no se modificará.
-                    Esta acción no se puede deshacer.
+                    Se eliminarán la rutina y los ejercicios asociados a ella. El catálogo de
+                    ejercicios no se modificará. Esta acción no se puede deshacer.
                   </p>
 
                   <div class="delete-confirmation__buttons">
@@ -228,11 +228,7 @@
                       [disabled]="deletingId() !== null || saving()"
                       (click)="confirmDelete(routine)"
                     >
-                      {{
-                        deletingId() === routine.id
-                          ? 'Eliminando...'
-                          : 'Sí, eliminar'
-                      }}
+                      {{ deletingId() === routine.id ? 'Eliminando...' : 'Sí, eliminar' }}
                     </button>
                   </div>
 
@@ -246,9 +242,7 @@
                 <button
                   class="button routine-delete-button"
                   type="button"
-                  [disabled]="
-                    saving() || loading() || deletingId() !== null
-                  "
+                  [disabled]="saving() || loading() || deletingId() !== null"
                   [attr.aria-label]="'Eliminar rutina ' + routine.name"
                   (click)="requestDelete(routine)"
                 >
