@@ -1,9 +1,5 @@
-import {
-  Component,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { Stack } from './structures/stack';
 import { DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -20,15 +16,15 @@ interface ExerciseDraft {
   repetitions: number;
 }
 
+interface SelectionChange {
+  exerciseId: string;
+  previousSelected: boolean;
+}
+
 @Component({
   selector: 'app-routines',
   standalone: true,
-  imports: [
-    DatePipe,
-    FormsModule,
-    RouterLink,
-    NavbarComponent,
-  ],
+  imports: [DatePipe, FormsModule, RouterLink, NavbarComponent],
   templateUrl: './routines.component.html',
   styleUrl: './routines.component.scss',
 })
@@ -36,11 +32,12 @@ export class RoutinesComponent implements OnInit {
   private readonly routineService = inject(RoutineService);
 
   private readonly exerciseNames = new Map(
-    EXERCISES.map((exercise) => [
-      exercise.id,
-      exercise.name,
-    ]),
+    EXERCISES.map((exercise) => [exercise.id, exercise.name]),
   );
+
+  private readonly selectionHistory = new Stack<SelectionChange>();
+  protected readonly historySize = signal(0);
+  protected readonly historyMessage = signal('');
 
   protected readonly routines = signal<Routine[]>([]);
   protected readonly loading = signal(true);
@@ -57,14 +54,13 @@ export class RoutinesComponent implements OnInit {
 
   protected routineName = '';
 
-  protected readonly exerciseDrafts: ExerciseDraft[] =
-    EXERCISES.map((exercise) => ({
-      exercise_id: exercise.id,
-      name: exercise.name,
-      selected: false,
-      sets: 1,
-      repetitions: 1,
-    }));
+  protected readonly exerciseDrafts: ExerciseDraft[] = EXERCISES.map((exercise) => ({
+    exercise_id: exercise.id,
+    name: exercise.name,
+    selected: false,
+    sets: 1,
+    repetitions: 1,
+  }));
 
   async ngOnInit(): Promise<void> {
     await this.loadRoutines();
@@ -107,29 +103,21 @@ export class RoutinesComponent implements OnInit {
     const name = this.routineName.trim();
 
     if (name.length === 0 || name.length > 80) {
-      this.formError.set(
-        'Escribe un nombre de entre 1 y 80 caracteres.',
-      );
+      this.formError.set('Escribe un nombre de entre 1 y 80 caracteres.');
       return;
     }
 
-    const selectedExercises = this.exerciseDrafts.filter(
-      (exercise) => exercise.selected,
-    );
+    const selectedExercises = this.exerciseDrafts.filter((exercise) => exercise.selected);
 
     if (selectedExercises.length === 0) {
-      this.formError.set(
-        'Selecciona al menos un ejercicio.',
-      );
+      this.formError.set('Selecciona al menos un ejercicio.');
       return;
     }
 
     if (form.invalid) {
       form.control.markAllAsTouched();
 
-      this.formError.set(
-        'Revisa las series y repeticiones de los ejercicios seleccionados.',
-      );
+      this.formError.set('Revisa las series y repeticiones de los ejercicios seleccionados.');
       return;
     }
 
@@ -200,15 +188,11 @@ export class RoutinesComponent implements OnInit {
     try {
       await this.routineService.deleteRoutine(routine.id);
 
-      this.routines.update((routines) =>
-        routines.filter((item) => item.id !== routine.id),
-      );
+      this.routines.update((routines) => routines.filter((item) => item.id !== routine.id));
 
       this.pendingDeleteId.set(null);
 
-      this.deleteSuccess.set(
-        `La rutina "${routine.name}" se eliminó correctamente.`,
-      );
+      this.deleteSuccess.set(`La rutina "${routine.name}" se eliminó correctamente.`);
     } catch (error: unknown) {
       console.error('Error al eliminar la rutina:', error);
 
@@ -221,13 +205,56 @@ export class RoutinesComponent implements OnInit {
   }
 
   protected getExerciseName(exerciseId: string): string {
-    return this.exerciseNames.get(exerciseId)
-      ?? `Ejercicio no disponible (${exerciseId})`;
+    return this.exerciseNames.get(exerciseId) ?? `Ejercicio no disponible (${exerciseId})`;
+  }
+
+  protected changeExerciseSelection(exercise: ExerciseDraft, selected: boolean): void {
+    if (this.saving() || this.deletingId() || this.loading()) {
+      return;
+    }
+
+    if (exercise.selected === selected) {
+      return;
+    }
+
+    this.selectionHistory.push({
+      exerciseId: exercise.exercise_id,
+      previousSelected: exercise.selected,
+    });
+
+    exercise.selected = selected;
+    this.historySize.set(this.selectionHistory.size);
+    this.historyMessage.set('');
+    this.formError.set('');
+    this.successMessage.set('');
+  }
+
+  protected undoSelection(): void {
+    if (this.saving() || this.deletingId() || this.loading()) {
+      return;
+    }
+
+    const change = this.selectionHistory.pop();
+    this.historySize.set(this.selectionHistory.size);
+
+    if (!change) {
+      return;
+    }
+
+    const exercise = this.exerciseDrafts.find((item) => item.exercise_id === change.exerciseId);
+
+    if (!exercise) {
+      return;
+    }
+
+    exercise.selected = change.previousSelected;
+    this.formError.set('');
+    this.successMessage.set('');
+    this.historyMessage.set(`Se deshizo el cambio de selección de ${exercise.name}.`);
   }
 
   private resetDraft(form: NgForm): void {
     form.resetForm();
-
     this.routineName = '';
 
     for (const exercise of this.exerciseDrafts) {
@@ -235,5 +262,9 @@ export class RoutinesComponent implements OnInit {
       exercise.sets = 1;
       exercise.repetitions = 1;
     }
+
+    this.selectionHistory.clear();
+    this.historySize.set(0);
+    this.historyMessage.set('');
   }
 }
