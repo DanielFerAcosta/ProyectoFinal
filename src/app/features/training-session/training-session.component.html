@@ -1,0 +1,209 @@
+<app-navbar />
+
+<main class="container training">
+  <header class="training__header">
+    <p class="training__eyebrow">
+      ÁREA PRIVADA
+    </p>
+
+    <h1>Sesión de entrenamiento</h1>
+
+    <p class="training__description">
+      Recorre los ejercicios de una rutina en el orden en que fueron guardados.
+    </p>
+
+    <a
+      class="training__back"
+      routerLink="/rutinas"
+    >
+      Volver a mis rutinas
+    </a>
+  </header>
+
+  <p class="training__notice">
+    Esta sesión es temporal. Si recargas o sales de la pantalla,
+    el progreso se reinicia. No se guardará un historial del entrenamiento.
+  </p>
+
+  @if (loading()) {
+    <p role="status">
+      Preparando entrenamiento...
+    </p>
+  } @else if (errorMessage()) {
+    <section class="training-card">
+      <h2>No se pudo iniciar</h2>
+
+      <p role="alert">
+        {{ errorMessage() }}
+      </p>
+
+      <div class="training__actions">
+        <button
+          class="button button--secondary"
+          type="button"
+          (click)="retry()"
+        >
+          Reintentar
+        </button>
+
+        <a
+          class="button button--primary"
+          routerLink="/entrenamiento"
+        >
+          Elegir otra rutina
+        </a>
+      </div>
+    </section>
+  } @else if (selectedRoutine(); as routine) {
+    <section
+      class="training-card"
+      aria-labelledby="session-title"
+    >
+      <p class="training__eyebrow">
+        RUTINA SELECCIONADA
+      </p>
+
+      <h2 id="session-title">
+        {{ routine.name }}
+      </h2>
+
+      <div class="training__progress-header">
+        <span>
+          {{ completedExercises() }} de
+          {{ totalExercises() }} ejercicios completados
+        </span>
+
+        <span>
+          {{ progressPercentage() }}%
+        </span>
+      </div>
+
+      <progress
+        class="training__progress"
+        aria-label="Progreso de la sesión"
+        [value]="completedExercises()"
+        [max]="totalExercises()"
+      ></progress>
+
+      @if (currentExercise(); as exercise) {
+        <div class="current-exercise">
+          <p class="training__eyebrow">
+            EJERCICIO
+            {{ completedExercises() + 1 }}
+            DE
+            {{ totalExercises() }}
+          </p>
+
+          <h3>{{ exercise.name }}</h3>
+
+          <dl class="current-exercise__details">
+            <div>
+              <dt>Series</dt>
+              <dd>{{ exercise.sets }}</dd>
+            </div>
+
+            <div>
+              <dt>Repeticiones por serie</dt>
+              <dd>{{ exercise.repetitions }}</dd>
+            </div>
+          </dl>
+
+          <p class="training__muted">
+            Ejercicios pendientes, incluyendo el actual:
+            {{ remainingExercises() }}.
+          </p>
+
+          <button
+            class="button button--primary"
+            type="button"
+            (click)="completeExercise()"
+          >
+            {{
+              remainingExercises() === 1
+                ? 'Completar y finalizar'
+                : 'Completar ejercicio'
+            }}
+          </button>
+        </div>
+      } @else {
+        <div class="training__finished">
+          <h3>Entrenamiento finalizado</h3>
+
+          <p>
+            Marcaste como completados los
+            {{ totalExercises() }} ejercicios de esta sesión.
+          </p>
+
+          <p class="training__muted">
+            Este resultado es temporal y no se ha guardado en tu cuenta.
+          </p>
+
+          <a
+            class="button button--primary"
+            routerLink="/entrenamiento"
+          >
+            Elegir otra rutina
+          </a>
+        </div>
+      }
+    </section>
+  } @else {
+    <section aria-labelledby="choose-routine-title">
+      <h2 id="choose-routine-title">
+        Elige una rutina
+      </h2>
+
+      @if (routines().length === 0) {
+        <div class="training-card">
+          <h3>Todavía no tienes rutinas</h3>
+
+          <p>
+            Crea una rutina antes de iniciar un entrenamiento.
+          </p>
+
+          <a
+            class="button button--primary"
+            routerLink="/rutinas"
+          >
+            Ir a mis rutinas
+          </a>
+        </div>
+      } @else {
+        <div class="training__routines">
+          @for (routine of routines(); track routine.id) {
+            <article class="training-card">
+              <h3>{{ routine.name }}</h3>
+
+              <p class="training__muted">
+                {{ routine.exercises.length }} ejercicios
+              </p>
+
+              @if (routine.exercises.length > 0) {
+                <a
+                  class="button button--primary"
+                  [routerLink]="[
+                    '/entrenamiento',
+                    routine.id
+                  ]"
+                >
+                  Iniciar entrenamiento
+                </a>
+              } @else {
+                <p class="training__muted">
+                  Esta rutina no tiene ejercicios.
+                </p>
+              }
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <p
+    class="training__announcement"
+    role="status"
+  >
+    {{ announcement() }}
+  </p>
+</main>
