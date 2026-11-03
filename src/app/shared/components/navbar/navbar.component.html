@@ -74,6 +74,15 @@
       } @else {
         @if (auth.user()) {
           <a
+  class="navigation__link"
+  routerLink="/bienestar"
+  routerLinkActive="navigation__link--active"
+  ariaCurrentWhenActive="page"
+  (click)="closeMenu()"
+>
+  Bienestar
+</a>
+          <a
             class="navigation__link"
             routerLink="/panel"
             routerLinkActive="navigation__link--active"

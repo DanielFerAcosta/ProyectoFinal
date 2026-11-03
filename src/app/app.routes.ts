@@ -76,6 +76,18 @@ export const routes: Routes = [
     ),
   title: 'Sesión de entrenamiento | Entrena',
 },
+
+{
+  path: 'bienestar',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import(
+      './features/wellbeing/wellbeing.component'
+    ).then(
+      (component) => component.WellbeingComponent,
+    ),
+  title: 'Mi bienestar | Entrena',
+},
   {
     path: '**',
     redirectTo: '',

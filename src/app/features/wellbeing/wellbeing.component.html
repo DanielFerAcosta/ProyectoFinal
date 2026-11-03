@@ -1,0 +1,240 @@
+<app-navbar />
+
+<main class="container wellbeing">
+  <header class="wellbeing__header">
+    <p class="wellbeing__eyebrow">
+      REGISTRO DIARIO
+    </p>
+
+    <h1>Mi bienestar</h1>
+
+    <p>
+      Registra el agua y el sueño de cada día.
+      Puedes volver a una fecha para corregir sus valores.
+    </p>
+  </header>
+
+  <section
+    class="wellbeing-card"
+    aria-labelledby="entry-title"
+  >
+    <h2 id="entry-title">
+      Agua y sueño
+    </h2>
+
+    <div class="wellbeing__field">
+      <label for="entry-date">
+        Fecha del registro
+      </label>
+
+      <input
+        id="entry-date"
+        type="date"
+        [value]="selectedDate()"
+        [disabled]="loading() || saving()"
+        (change)="changeDate($event)"
+      />
+    </div>
+
+    @if (loading()) {
+      <p role="status">
+        Cargando registros...
+      </p>
+    }
+
+    @if (errorMessage()) {
+      <p
+        class="wellbeing__error"
+        role="alert"
+      >
+        {{ errorMessage() }}
+      </p>
+    }
+
+    @if (
+      !loading() &&
+      !entryReady() &&
+      errorMessage()
+    ) {
+      <button
+        class="button button--secondary"
+        type="button"
+        (click)="retry()"
+      >
+        Reintentar
+      </button>
+    }
+
+    @if (entryReady()) {
+      <p class="wellbeing__muted">
+        {{
+          existingEntry()
+            ? 'Ya tienes un registro para esta fecha. Puedes actualizarlo.'
+            : 'Todavía no hay un registro para esta fecha.'
+        }}
+      </p>
+
+      <form
+        [formGroup]="form"
+        (ngSubmit)="save()"
+      >
+        <fieldset [disabled]="saving()">
+          <legend>
+            Totales del día
+          </legend>
+
+          <div class="wellbeing__field">
+            <label for="water-ml">
+              Agua consumida en mililitros
+            </label>
+
+            <input
+              id="water-ml"
+              type="number"
+              min="0"
+              max="2147483647"
+              step="1"
+              formControlName="water_ml"
+              aria-describedby="water-help"
+            />
+
+            <p
+              id="water-help"
+              class="wellbeing__muted"
+            >
+              Ejemplo: 1500 ml equivalen a 1,5 litros.
+            </p>
+
+            @if (
+              form.controls.water_ml.touched &&
+              form.controls.water_ml.invalid
+            ) {
+              <p class="wellbeing__error">
+                Introduce una cantidad entera,
+                no negativa y dentro del rango permitido.
+              </p>
+            }
+          </div>
+
+          <div class="wellbeing__field">
+            <label for="sleep-minutes">
+              Sueño en minutos
+            </label>
+
+            <input
+              id="sleep-minutes"
+              type="number"
+              min="0"
+              max="1440"
+              step="1"
+              formControlName="sleep_minutes"
+              aria-describedby="sleep-help"
+            />
+
+            <p
+              id="sleep-help"
+              class="wellbeing__muted"
+            >
+              Ejemplo: 7 horas y media son 450 minutos.
+              Asigna el descanso a la fecha en la que despertaste.
+            </p>
+
+            @if (
+              form.controls.sleep_minutes.touched &&
+              form.controls.sleep_minutes.invalid
+            ) {
+              <p class="wellbeing__error">
+                Introduce un número entero entre
+                0 y 1440 minutos.
+              </p>
+            }
+          </div>
+
+          <p class="wellbeing__muted">
+            Guardar reemplaza los totales de esta fecha;
+            no los suma al registro anterior.
+          </p>
+
+          <button
+            class="button button--primary"
+            type="submit"
+            [disabled]="saving()"
+            [attr.aria-busy]="saving()"
+          >
+            {{
+              saving()
+                ? 'Guardando...'
+                : 'Guardar registro'
+            }}
+          </button>
+        </fieldset>
+      </form>
+    }
+
+    <p
+      class="wellbeing__success"
+      role="status"
+    >
+      {{ successMessage() }}
+    </p>
+  </section>
+
+  <section
+    class="wellbeing__history"
+    aria-labelledby="history-title"
+  >
+    <h2 id="history-title">
+      Historial de bienestar
+    </h2>
+
+    <p class="wellbeing__muted">
+      Hasta 30 registros, ordenados del más reciente
+      al más antiguo.
+    </p>
+
+    @if (loading()) {
+      <p>Cargando historial...</p>
+    } @else if (entryReady()) {
+      @if (history().length === 0) {
+        <p>
+          Todavía no tienes registros guardados.
+        </p>
+      } @else {
+        <div class="wellbeing__entries">
+          @for (entry of history(); track entry.id) {
+            <article class="wellbeing-card">
+              <h3>
+                <time [attr.datetime]="entry.entry_date">
+                  {{ entry.entry_date }}
+                </time>
+              </h3>
+
+              <dl class="wellbeing__details">
+                <div>
+                  <dt>Agua</dt>
+                  <dd>{{ entry.water_ml }} ml</dd>
+                </div>
+
+                <div>
+                  <dt>Sueño</dt>
+                  <dd>
+                    {{ formatMinutes(entry.sleep_minutes) }}
+                  </dd>
+                </div>
+              </dl>
+
+              <button
+                class="button button--secondary"
+                type="button"
+                [disabled]="saving() || loading()"
+                (click)="openDate(entry.entry_date)"
+              >
+                Ver o editar
+              </button>
+            </article>
+          }
+        </div>
+      }
+    }
+  </section>
+</main>
