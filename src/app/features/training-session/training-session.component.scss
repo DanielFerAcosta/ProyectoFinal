@@ -49,6 +49,19 @@
     line-height: 1.7;
   }
 
+  &__selection-header {
+    margin-bottom: 1.25rem;
+
+    h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
   &__routines {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -58,6 +71,26 @@
   &__muted {
     color: #b9bdb3;
     line-height: 1.7;
+  }
+
+  &__sync {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #4c5740;
+    border-radius: 1rem;
+    background: #151b11;
+
+    p {
+      margin: 0;
+      color: #b9bdb3;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
   }
 
   &__progress-header {
@@ -97,6 +130,16 @@
     }
   }
 
+  &__error {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #805050;
+    border-radius: 0.875rem;
+    background: #261b1b;
+    color: #fca5a5;
+    line-height: 1.7;
+  }
+
   &__actions {
     display: flex;
     flex-wrap: wrap;
@@ -114,6 +157,22 @@
 
     p {
       line-height: 1.7;
+    }
+  }
+
+  &__history {
+    margin-top: 3rem;
+  }
+
+  &__history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
     }
   }
 
@@ -146,11 +205,16 @@
       outline-offset: 3px;
     }
 
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     &--primary {
       background: #a3e635;
       color: #10140d;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: #b4f34b;
       }
     }
@@ -160,7 +224,7 @@
       background: transparent;
       color: #e6e9df;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background: #252d1e;
       }
     }
@@ -190,6 +254,16 @@
 
   > p {
     line-height: 1.7;
+  }
+
+  &--featured {
+    margin-bottom: 2rem;
+    border-color: #a3e635;
+    background: #202c15;
+
+    > h3 {
+      font-size: 1.5rem;
+    }
   }
 }
 
@@ -251,6 +325,16 @@
 
   .current-exercise {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .training {
+    &__sync,
+    &__history-header {
+      align-items: stretch;
+      flex-direction: column;
+    }
   }
 }
 
